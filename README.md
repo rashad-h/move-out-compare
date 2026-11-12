@@ -2,6 +2,8 @@
 
 RightView is a 3D property inspection dashboard for landlords and tenants. It connects the move-in inventory, guided checkout photos, and an itemised report to the same interactive 3D model.
 
+[Watch the RightView demo on YouTube](https://youtu.be/WJsXWvt6EZI)
+
 ![Checkout review with the missing waste bin and chair highlighted red in the 3D room](docs/images/checkout-review.png)
 
 ## Walk through an inspection
