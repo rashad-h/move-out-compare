@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move-Out Compare | Room evidence</title>
+<style>
+:root{color-scheme:light;--ink:#152632;--paper:#f4f7f9;--line:#d8e1e7;--accent:#086b83;--muted:#506572;--stage:#dce7ed}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px system-ui,sans-serif}button{font:inherit;cursor:pointer;color:inherit}button:focus-visible{outline:3px solid #138ba8;outline-offset:3px}
+header{padding:22px 4vw 19px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px}header strong{font-size:16px}header span{color:var(--muted);font-size:13px}
+main{max-width:1600px;margin:auto;padding:30px 4vw 40px}h1{font-size:clamp(32px,4vw,53px);line-height:1.02;letter-spacing:-.055em;margin:0 0 12px}p{margin:0;line-height:1.55;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;margin-top:25px;align-items:start}.model,.photos{border:1px solid var(--line);background:white;border-radius:15px;overflow:hidden}.bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:13px 17px;border-bottom:1px solid var(--line)}.bar h2,.photos h2{font-size:16px;margin:0}.controls{display:flex;gap:6px}.controls button,.enlarge,dialog button{border:1px solid var(--line);background:white;padding:7px 10px;border-radius:7px;font-size:13px}.controls [aria-pressed=true]{background:#dff1f6;border-color:#a6cfda;color:#064e61}
+#stage{height:clamp(360px,61vh,680px);position:relative;background:var(--stage);overflow:hidden}canvas{display:block;touch-action:none}.status{position:absolute;left:14px;top:14px;padding:7px 10px;background:#fff;border-radius:6px;font-size:13px;pointer-events:none}.caption{padding:12px 17px;font-size:13px}.photos{padding:15px}.hero{display:block;width:100%;aspect-ratio:4/4.2;object-fit:contain;background:#e8eef2;margin:12px 0;border-radius:8px}.details{display:flex;justify-content:space-between;align-items:center;gap:8px}.details strong{font-size:14px}.photos p{font-size:13px;margin-top:7px;min-height:40px}
+#thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:13px}.thumb{border:2px solid transparent;padding:2px;border-radius:7px;background:#e8eef2;min-width:0}.thumb[aria-pressed=true]{border-color:var(--accent);background:#dff1f6}.thumb img{width:100%;height:61px;object-fit:cover;border-radius:3px;display:block}.thumb span{display:block;text-align:center;font-size:11px;padding:3px 0 1px}
+dialog{border:0;border-radius:12px;padding:12px;max-width:94vw;max-height:94vh}dialog::backdrop{background:#10202bdc}dialog form{text-align:right;margin-bottom:8px}dialog img{display:block;max-width:88vw;max-height:78vh;object-fit:contain}
+.layout.walking{grid-template-columns:minmax(0,1fr)}.walking canvas{cursor:grab}.walking canvas:active{cursor:grabbing}[hidden]{display:none!important}
+.walking #stage{position:fixed;inset:0;width:100%;height:100%;z-index:10}.walking #stage:fullscreen{width:100%;height:100%}.walking canvas{cursor:crosshair}
+.walk-help,.aim,.evidence{position:absolute}.walk-help{left:14px;right:14px;bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;pointer-events:none;color:white;font-size:13px;text-shadow:0 1px 4px #000}.walk-help button,.evidence button{pointer-events:auto;border:1px solid var(--line);background:white;border-radius:7px;padding:7px 10px}.aim{top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:27px;text-shadow:0 0 4px #000;pointer-events:none}
+.evidence{right:16px;top:16px;width:min(320px,calc(100% - 32px));max-height:calc(100% - 90px);overflow:auto;padding:15px;border-radius:12px;background:white;box-shadow:0 12px 40px #15263248}.evidence-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.evidence h2{font-size:19px;margin:0}.evidence p{font-size:13px;margin-top:8px}.evidence strong{display:block;margin-top:8px;color:#086b83}.crop{position:relative;overflow:hidden;margin-top:12px;border-radius:8px;background:#e8eef2}.crop img{position:absolute;max-width:none}
+.walk-help button{color:var(--ink);text-shadow:none}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}.comparison figure{margin:0}.comparison img{display:block;width:100%;height:clamp(200px,38vw,360px);object-fit:contain;background:#e8eef2;border-radius:8px}.comparison figcaption{margin-top:5px}.review-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.review-actions button,.inventory select{border:1px solid var(--line);background:white;padding:6px 10px;border-radius:6px;font:inherit}.review-actions button:disabled{opacity:.55}
+.inventory{margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:15px;background:white}.inventory h2{margin:0 0 6px;font-size:20px}.inventory a,header a{color:var(--accent)}.inventory-list{display:grid;gap:0;margin-top:12px}.inventory-row{display:grid;grid-template-columns:minmax(115px,1fr) minmax(95px,auto) minmax(130px,auto);align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.inventory-row select{font:inherit;color:var(--ink);max-width:100%;padding:5px;border:1px solid var(--line);border-radius:5px;background:white}.missing{color:#a33a13;font-weight:700}.inventory-summary{margin-top:12px} @media(max-width:490px){.inventory-row{grid-template-columns:1fr 1fr}.inventory-row span:last-child{grid-column:2}}
+@media(max-width:820px){.layout{grid-template-columns:1fr}.hero{max-height:340px}.photos{grid-row:2}#stage{height:48vh;min-height:320px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:12px}.review-card{border:1px solid var(--line);border-radius:10px;padding:13px;scroll-margin:16px}.review-card h3{margin:0}.review-card .comparison img{height:clamp(150px,22vw,280px)}.review-card:target{outline:2px solid var(--accent)}@media(max-width:760px){.review-grid{grid-template-columns:1fr}}
+.checkout-page .room-heading,.checkout-page .photos,.checkout-page #camera,.checkout-page #walkthrough{display:none}.checkout-page{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:18px;align-items:start}.checkout-page .layout{display:block;margin:0}.checkout-page #checkout-review,.checkout-page #inventory{margin:0}.checkout-page #inventory{grid-column:1/-1}.checkout-page .review-grid{grid-template-columns:1fr}.checkout-page .review-card .comparison img{height:clamp(125px,17vw,230px)}.checkout-page #stage{height:clamp(360px,68vh,700px)}body:not(.review-active) #checkout-review{display:none}@media(max-width:820px){.checkout-page{display:block}.checkout-page #checkout-review,.checkout-page #inventory{margin-top:18px}}
+.review-active header{position:sticky;top:0;z-index:5}.checkout-page #checkout-review,.checkout-page .review-card{scroll-margin-top:78px}.checkout-page .review-card .comparison img{height:clamp(115px,22vh,175px)}
+body:not(.review-active) #inventory{display:none}nav [aria-current="page"]{font-weight:700}
+.checkout-report{grid-column:1/-1;margin-top:0}.report-total{margin:14px 0;padding:10px 14px;border-left:4px solid var(--accent);background:#f2f7fa}.report-total strong{display:block;font-size:30px;font-variant-numeric:tabular-nums}.report-scroll{overflow:auto}.report-table{width:100%;border-collapse:collapse;margin-top:12px}.report-table th,.report-table td{text-align:left;padding:9px 12px 9px 0;border-bottom:1px solid var(--line)}.report-table th:last-child,.report-table td:last-child{text-align:right;white-space:nowrap}.valuation-list{padding-left:20px}.valuation-list li{margin:6px 0}body:not(.review-active) .checkout-report{display:none}
+.checkin-register{padding:24px;background:#fff}.register-heading{display:flex;justify-content:space-between;align-items:start;gap:14px;margin-bottom:18px}.register-heading h2{font-size:26px;letter-spacing:-.035em}.register-count{white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:13px}.register-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}.asset-card{overflow:hidden;border:1px solid var(--line);border-radius:11px;background:#fff;display:flex;flex-direction:column}.asset-image{height:140px;position:relative;overflow:hidden;background:#dce7ed}.asset-image img{position:absolute;max-width:none;left:50%;top:50%}.asset-body{padding:13px;display:flex;flex-direction:column;gap:8px;flex:1}.asset-body h3{font-size:16px;margin:0}.asset-meta{display:flex;justify-content:space-between;gap:6px;font-size:13px}.asset-body p{font-size:13px}.asset-source{align-self:start;margin-top:auto;border:0;background:none;color:var(--accent);padding:4px 0;text-decoration:underline;text-underline-offset:3px;font-size:13px}
+.report-page{display:block}.report-page .layout,.report-page #checkout-review,.report-page #inventory{display:none}.checkout-report{padding:0;overflow:hidden}.report-hero{padding:clamp(22px,5vw,56px);background:#163337;color:#fff}.report-hero h2{font-size:clamp(35px,5vw,62px);letter-spacing:-.06em;line-height:1;margin:12px 0}.report-hero p,.report-hero a{color:#c4ddd7}.report-tag{display:inline-block;border:1px solid #799b94;border-radius:99px;padding:4px 10px;font-size:13px}.report-body{padding:clamp(18px,4vw,42px)}.report-metrics{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px}.report-metric{padding:14px 16px;border-top:3px solid #829f98;background:#edf4f2}.report-metric:first-child{border-color:#a94427;background:#f8ede6}.report-metric span{font-size:13px;color:#465e5a}.report-metric strong{display:block;font-size:clamp(23px,4vw,40px);line-height:1.25;font-variant-numeric:tabular-nums}.report-body h3{margin:25px 0 6px;font-size:20px}.report-table th{background:#eef2f3;color:#425961;font-size:13px}.report-table th,.report-table td{padding:12px 10px}.report-table td:last-child{font-weight:700}.report-body details{margin-top:20px;padding-top:12px;border-top:1px solid var(--line)}@media(max-width:520px){.report-metrics{grid-template-columns:1fr 1fr}.report-metric:first-child{grid-column:1/-1}}
+.report-case{display:flex;flex-wrap:wrap;gap:22px;margin:24px 0 0}.report-case div{min-width:130px}.report-case dt{font-size:12px;color:#c4ddd7}.report-case dd{margin:4px 0 0;font-weight:650}.report-state{margin-top:12px!important}.report-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.finding{border:1px solid var(--line);border-radius:12px;padding:14px}.finding h4{margin:0 0 8px}.finding .comparison img{height:clamp(110px,17vw,190px)}.finding a{display:inline-block;margin-top:8px}.report-equation{margin-top:9px}.report-table .missing-value{color:#a33a13}@media(max-width:680px){.report-evidence{grid-template-columns:1fr}}
+.report-narrative{max-width:86ch}.report-narrative p+p{margin-top:12px}
+.capture-page .layout,.capture-page .room-heading{display:none}body:not(.capture-active) #capture-panel{display:none}.capture-page #capture-panel{margin-top:0}.capture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}.capture-slot{padding:14px;border:1px solid var(--line);border-radius:10px;min-width:0}.capture-slot h3{margin:0 0 6px}.capture-slot p{min-height:3em}.capture-slot img{width:100%;height:clamp(140px,20vw,250px);object-fit:contain;background:#e8eef2;border-radius:8px;margin:10px 0}.capture-slot input{max-width:100%}.capture-status{display:flex;align-items:center;gap:12px;margin-top:16px}.capture-spinner{width:25px;height:25px;border:3px solid #cce0e0;border-top-color:#086b83;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.capture-spinner{animation:none}}@media(max-width:760px){.capture-grid{grid-template-columns:1fr}.capture-slot p{min-height:0}}
+.capture-page .layout{display:block;margin-top:0}.capture-page .photos,.capture-page #camera,.capture-page #walkthrough{display:none}.capture-page #stage{height:clamp(320px,48vh,510px)}.capture-pin{position:absolute;z-index:2;transform:translate(-50%,-50%);display:grid;place-items:center;width:32px;height:32px;border:2px solid white;border-radius:50%;background:#086b83;color:#fff;font-weight:750;box-shadow:0 2px 8px #14273360}.capture-pin[aria-pressed=true]{background:#163337;outline:3px solid #7dd4d4}.capture-guide{border:0;padding:0;background:none;text-align:left;font-weight:750;color:var(--accent)}.capture-guide[aria-pressed=true]{text-decoration:underline;text-underline-offset:3px}.capture-upload{display:grid;gap:7px;padding:15px;border:1px dashed #8fa8b2;border-radius:10px;background:#f5f9fa}.capture-upload input{max-width:100%}
+.review-comparison{margin-top:10px}.review-comparison>summary{display:flex;align-items:center;gap:14px;cursor:pointer;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:#f5f8fa;list-style:none}.review-comparison>summary::-webkit-details-marker{display:none}.review-comparison>summary::after{content:"+";margin-left:auto;color:var(--accent);font-size:21px}.review-comparison[open]>summary::after{content:"−"}.review-result{margin-top:4px;font-weight:650}.review-result.missing{color:#b42318;font-size:clamp(24px,3vw,34px);line-height:1.15;font-weight:800}.review-comparison-label{font-weight:650;color:var(--accent)}
+</style>
+<header><strong>Move-Out Compare</strong><nav aria-label="Dashboard"><a id="room-link" href="#room">Check-in</a> · <a id="checkout-link" href="#checkout-capture">Checkout</a></nav></header>
+<main>
+  <div class="room-heading" id="room">
+    <h1>Meeting room</h1>
+    <p>Select a photo to see where it was taken and which way the camera faced.</p>
+  </div>
+  <div class="layout">
+    <section class="model" aria-label="Interactive room model">
+      <div class="bar"><h2>Room model</h2><div class="controls"><button id="overview" aria-pressed="true" disabled>Overview</button><button id="camera" aria-pressed="false" disabled>Photo angle</button><button id="walkthrough" aria-pressed="false" disabled>Walkthrough</button></div></div>
+      <div id="stage"><div class="status" id="status" role="status">Loading room model…</div>
+        <div id="aim" class="aim" aria-hidden="true" hidden>+</div>
+        <div id="walk-help" class="walk-help" hidden><button id="resume-look">Enable mouse look</button><button id="exit-walk">Exit walkthrough</button><span>WASD to move · Click or Enter to inspect · E to close the card</span></div>
+        <aside id="evidence" class="evidence" aria-label="Move-in condition" hidden>
+          <div class="evidence-head"><h2 id="item-name"></h2><button id="close-evidence">Close</button></div>
+          <strong id="item-status"></strong><p id="item-note"></p>
+          <p id="item-value"></p>
+          <div class="crop" id="item-crop"><img id="item-image" alt=""></div><p id="item-source"></p>
+          <a id="item-review" hidden>Compare checkout photos</a>
+        </aside>
+      </div>
+      <p class="caption" id="caption">Camera positions and angles are estimated from the photos. Drag to orbit. Scroll or pinch to zoom.</p>
+    </section>
+    <aside class="photos"><h2>Original photos</h2>
+      <img id="hero" class="hero" alt="">
+      <div class="details"><strong id="name"></strong><button class="enlarge" id="enlarge">Enlarge</button></div>
+      <p id="description" aria-live="polite"></p>
+      <div id="thumbs" aria-label="Select an original photo"></div>
+    </aside>
+  </div>
+  <section class="inventory room-heading checkin-register" aria-labelledby="checkin-inventory-title">
+    <div class="register-heading"><div><h2 id="checkin-inventory-title">Check-in inventory</h2><p>Original condition and photo evidence. Replacement values are sample figures.</p></div><span class="register-count" id="checkin-count"></span></div>
+    <div id="checkin-inventory-list" class="register-grid"></div>
+  </section>
+  <section class="inventory" id="capture-panel" aria-labelledby="capture-title">
+    <h2 id="capture-title">Submit checkout photos</h2>
+    <p>Use the numbered cameras on the model to see where to stand and which direction to face.</p>
+    <div id="capture-grid" class="capture-grid"></div>
+    <label class="capture-upload"><strong>Upload all three checkout photos</strong><span>Select three JPEG, PNG, or WebP files. They are assigned to viewpoints 1–3 in filename order.</span><input id="capture-files" type="file" multiple accept="image/jpeg,image/png,image/webp"></label>
+    <p id="capture-error" role="alert"></p>
+    <p>Photos stay in this browser session.</p>
+    <div class="review-actions"><button id="capture-sample" type="button">Use demo photos</button><button id="capture-generate" type="button" disabled>Generate checkout review</button></div>
+    <div class="capture-status" role="status"><span id="capture-spinner" class="capture-spinner" aria-hidden="true" hidden></span><span id="capture-status">0 of 3 photos ready</span></div>
+  </section>
+  <section class="inventory" id="checkout-review" aria-labelledby="review-title">
+    <h2 id="review-title">Checkout review</h2>
+    <p>Staged demo findings. Missing items are red in the room model. <a href="#checkout-report">View report</a></p>
+    <div id="review-grid" class="review-grid"></div>
+  </section>
+  <section class="inventory" id="inventory" aria-labelledby="inventory-title">
+    <h2 id="inventory-title">Checkout inventory</h2>
+    <p>Count what is present at checkout. The move-in list is based on the reference photos.</p>
+    <div id="inventory-list" class="inventory-list"></div>
+    <p id="inventory-summary" class="inventory-summary" role="status"></p>
+  </section>
+  <section class="inventory checkout-report" id="checkout-report" aria-labelledby="report-title">
+    <div class="report-hero"><a href="#checkout-review">Back to checkout review</a><h2 id="report-title">Checkout report</h2><p>Meeting room · Demo case</p>
+      <dl class="report-case"><div><dt>Case reference</dt><dd>MOC-017</dd></div><div><dt>Sample tenancy</dt><dd>13 Nov 2025 to 12 Nov 2026</dd></div><div><dt>Checkout date</dt><dd>12 Nov 2026</dd></div><div><dt>Sample deposit held</dt><dd>£1,200</dd></div><div><dt>Decision status</dt><dd>Awaiting reviewer decision</dd></div></dl>
+    </div>
+    <div class="report-body">
+    <div class="report-metrics">
+      <div class="report-metric"><span>Sample replacement total</span><strong id="report-total"></strong></div>
+      <div class="report-metric"><span>Items flagged missing</span><strong id="report-missing"></strong></div>
+      <div class="report-metric"><span>Accounted for</span><strong id="report-accounted"></strong></div>
+    </div>
+    <p class="report-equation" id="report-equation"></p>
+    <h3>Summary</h3>
+    <div class="report-narrative">
+      <p id="report-summary"></p>
+      <p id="report-summary-evidence"></p>
+      <p>Fine surface wear, cleaning, keys and meter readings were outside this photo review. Before deciding on any deposit deduction, the reviewer should check the agreed inventory and supporting replacement costs, and give the tenant an opportunity to comment or supply additional photos. Tenant comments are pending and no deduction has been agreed in this demo case.</p>
+    </div>
+    <h3>Inventory reconciliation</h3>
+    <p id="report-coverage"></p>
+    <div class="report-scroll"><table class="report-table">
+      <thead><tr><th scope="col">Inventory item</th><th scope="col">At check-in</th><th scope="col">At checkout</th><th scope="col">Finding</th><th scope="col">Sample missing value</th></tr></thead>
+      <tbody id="report-lines"></tbody>
+    </table></div>
+    <h3>Photo evidence</h3>
+    <div class="report-evidence" id="report-evidence"></div>
+    <details><summary>Sample values for all inventory items</summary><ul class="valuation-list" id="valuation-list"></ul></details>
+    </div>
+  </section>
+</main>
+<template id="review-card-template">
+  <article class="review-card">
+    <h3></h3>
+    <p class="review-result" role="status"></p>
+    <details class="review-comparison">
+      <summary><span class="review-comparison-label">View before and after</span></summary>
+      <div class="comparison">
+        <figure><img class="before" alt="Original move-in reference"><figcaption>Before · move-in</figcaption></figure>
+        <figure><img class="after" alt="Checkout photo"><figcaption>After · checkout</figcaption></figure>
+      </div>
+      <p class="review-note"></p>
+      <details class="review-extra" hidden><summary>Second checkout photo</summary><img alt="Checkout view along the artwork wall" style="max-width:min(100%,360px)"></details>
+    </details>
+    <div class="review-actions"><button class="review-model" disabled>Show in 3D</button><button class="review-retake">Mark retake needed</button><button class="review-confirm">Confirm 1 missing</button></div>
+  </article>
+</template>
+<dialog id="photo-dialog"><form method="dialog"><button>Close</button></form><img id="full" alt=""></dialog>
+<!-- APP -->
+</html>

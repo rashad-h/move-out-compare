@@ -1,0 +1,11 @@
+{
+  "coordinateSystem": "Y-up; entrance +Z; rear -Z; nominal units metres",
+  "status": "Manual visual estimates only. Not solved camera poses, not calibrated, and not suitable for image registration or measurement.",
+  "fieldOfViewConvention": "Vertical FOV, approximate; source portrait aspect 0.75",
+  "views": [
+    {"photo": "IMG_1878.jpeg", "position": [0.0, 1.82, 1.72], "target": [0.0, 1.50, -1.55], "verticalFovDegrees": 78, "uncertainty": "High. Entrance looking rearward; camera height, wide-angle distortion and framing are visually estimated."},
+    {"photo": "IMG_1879.jpeg", "position": [0.52, 1.67, 1.12], "target": [-0.91, 1.47, 1.89], "verticalFovDegrees": 76, "uncertainty": "High. Near entrance looking toward glazing/side-wall junction; translation and lens parameters unknown."},
+    {"photo": "IMG_1880.jpeg", "position": [0.36, 1.68, -0.73], "target": [-0.19, 1.64, -1.73], "verticalFovDegrees": 79, "uncertainty": "Very high. Close rear pier/plant view with limited shared features; depth and camera yaw are approximate."},
+    {"photo": "IMG_1881.jpeg", "position": [0.12, 1.85, -1.57], "target": [0.0, 1.69, 1.72], "verticalFovDegrees": 80, "uncertainty": "High. Rear looking toward entrance; no metric pose or lens calibration."}
+  ]
+}

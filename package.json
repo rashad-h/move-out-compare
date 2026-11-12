@@ -1,0 +1,14 @@
+{
+  "name": "move-out-compare",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node src/package-dashboard.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

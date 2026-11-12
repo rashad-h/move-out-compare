@@ -1,18 +1,26 @@
 # Move-Out Compare
 
-Match move-out photos to the same fixtures at move-in so tenants and property managers can review what visibly changed.
+A 3D evidence dashboard for end-of-tenancy inspections. Move-Out Compare connects the move-in inventory, guided checkout photography, and an itemised review to the same interactive room model.
 
-## Hackathon prototype
+## Walk through an inspection
 
-1. A landlord or agent records a move-in walkthrough. The prototype organises reference frames by room and fixture.
-2. At checkout, the tenant sees a reference photo and takes a matching shot. An optional overlay helps line up the angle.
-3. Grok Bot proposes photo matches and describes visible differences. A weak match prompts a retake or leaves the item unverified.
-4. Both parties review the paired evidence and can add comments. People make any deposit decisions.
+1. **Check in.** Explore the room in 3D or walk through it with WASD and mouse look. Select an inventory item to inspect its recorded condition, reference photo, and value.
+2. **Capture checkout.** Use three camera markers in the room model to see where to stand and which way to face. Add all three photos through a single upload control.
+3. **Review and report.** See missing items highlighted together in red. Select an item to locate it in the model and expand its before-and-after evidence. The checkout report brings the findings, itemised replacement values, and evidence together for review.
 
-## Demo
+## How it works
 
-Use one staged kitchen. Show a worktop scratch visible at both inspections, an oven whose visible condition changed, and a fridge interior that still needs a photo. Each finding opens the two source images and their capture dates.
+- **3D scene.** Three.js renders a textured glTF room. Viewpoints store a position, look target, and vertical field of view. Raycasting maps model selections to inventory entries.
+- **Evidence and reporting.** Inventory IDs tie together mesh highlights, item counts, reference photos, and report rows. The report totals follow the review state, and inventory counts persist in browser storage.
+- **Packaging.** esbuild bundles the JavaScript. The build embeds the room model and evidence assets in a single HTML file. The dashboard runs in the browser without a server.
 
-See the [project brief](PROJECT-BRIEF.md) for scope and acceptance criteria.
+## Run locally
 
-This repository currently contains the project proposal. Demo assets should be staged or synthetic. Keep real inspection photos, tenant information, addresses, and API credentials out of this public repository.
+Use Node.js 18 or later. Supply the matching GLB at `assets/room.glb` and the four JPEGs named in [the viewpoint manifest](assets/photo-viewpoints.json) in `assets/photos/`. Put three checkout JPEGs in `assets/photos/tenant-pics/`, named in capture order so they sort correctly. The photo set and its textured model are kept outside version control.
+
+```sh
+npm install
+npm run build
+```
+
+Open `dist/dashboard.html` in a WebGL-capable browser. If your photos are elsewhere, pass their directory with `npm run build -- /path/to/photos`.
