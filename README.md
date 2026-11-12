@@ -1,6 +1,6 @@
-# Move-Out Compare
+# RightView
 
-A 3D evidence dashboard for end-of-tenancy inspections. Move-Out Compare connects the move-in inventory, guided checkout photography, and an itemised review to the same interactive room model.
+RightView is a 3D property inspection dashboard for landlords and tenants. It connects the move-in inventory, guided checkout photos, and an itemised report to the same interactive 3D model.
 
 ![Checkout review with the missing waste bin and chair highlighted red in the 3D room](docs/images/checkout-review.png)
 
